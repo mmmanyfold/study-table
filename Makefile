@@ -9,3 +9,6 @@ clean:
 
 deploy: clean build
 	echo "fix me"
+
+format:
+	go fmt ./src
