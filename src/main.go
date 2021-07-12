@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -8,7 +9,7 @@ import (
 	"os"
 )
 
-func GetRecords(table string) {
+func GetRecords(table string) ArtistRecords {
 	baseURL := fmt.Sprintf("https://api.airtable.com/v0/appgnbNAyXRTziPYF/%s", table)
 
 	req, err := http.NewRequest("GET", baseURL, nil)
@@ -31,7 +32,13 @@ func GetRecords(table string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(string(body))
+	var artistsJSON ArtistRecords
+	err = json.Unmarshal([]byte(body), &artistsJSON)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return artistsJSON
 }
 
 func main() {
