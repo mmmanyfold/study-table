@@ -1,4 +1,4 @@
-package main
+package airtable
 
 import (
 	"encoding/json"
@@ -41,6 +41,10 @@ func GetRecords(table string) ArtistRecords {
 	return artistsJSON
 }
 
-func main() {
-	GetRecords("Artists")
+func ExtractTags(artists ArtistRecords) {
+	for i := 0; i < len(artists.Records); i++ {
+		if artists.Records[i].Fields.Tags != nil {
+			fmt.Printf("%s \n", artists.Records[i].Fields.Tags)
+		}
+	}
 }

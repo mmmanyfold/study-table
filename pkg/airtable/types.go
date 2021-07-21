@@ -1,11 +1,11 @@
-package main
+package airtable
 
 type ArtistRecords struct {
 	Records []struct {
 		CreatedTime string `json:"createdTime"`
 		Fields      struct {
-			Bio     string `json:"Bio"`
-			Imzaage []struct {
+			Bio   string `json:"Bio"`
+			Image []struct {
 				Filename   string `json:"filename"`
 				ID         string `json:"id"`
 				Size       int64  `json:"size"`
