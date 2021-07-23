@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", healthHandler)
-	http.HandleFunc("/webhook", webhookHandler)
+	http.HandleFunc("/", HealthHandler)
+	http.HandleFunc("/webhook", WebhookHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

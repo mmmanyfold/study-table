@@ -1,5 +1,10 @@
 package airtable
 
+type TagRecord struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type ArtistRecords struct {
 	Records []struct {
 		CreatedTime string `json:"createdTime"`
@@ -35,4 +40,9 @@ type ArtistRecords struct {
 		} `json:"fields"`
 		ID string `json:"id"`
 	} `json:"records"`
+}
+
+type ArtistAndTagsResponse struct {
+	Tags    []TagRecord     `json:"tags"`
+	Artists []ArtistRecords `json:"artists"`
 }

@@ -33,6 +33,7 @@ func GetRecords(table string) ArtistRecords {
 	}
 
 	var artistsJSON ArtistRecords
+
 	err = json.Unmarshal([]byte(body), &artistsJSON)
 	if err != nil {
 		log.Fatal(err)
@@ -41,10 +42,33 @@ func GetRecords(table string) ArtistRecords {
 	return artistsJSON
 }
 
-func ExtractTags(artists ArtistRecords) {
-	for i := 0; i < len(artists.Records); i++ {
-		if artists.Records[i].Fields.Tags != nil {
-			fmt.Printf("%s \n", artists.Records[i].Fields.Tags)
+func ExtractTags(artists ArtistRecords) []TagRecord {
+	var tags []TagRecord
+	var tagCount = 1
+
+	for _, r := range artists.Records {
+		if len(r.Fields.Tags) > 0 {
+			for _, t := range r.Fields.Tags {
+				if !FilterTag(tags, t) {
+					tags = append(tags, TagRecord{
+						Id:   tagCount,
+						Name: t,
+					})
+					tagCount += 1
+				}
+			}
 		}
 	}
+
+	return tags
+}
+
+func FilterTag(tags []TagRecord, tag string) bool {
+	for _, t := range tags {
+		if t.Name == tag {
+			return true
+		}
+	}
+
+	return false
 }

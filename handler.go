@@ -6,11 +6,11 @@ import (
 	"github.com/mmmanyfold/study-table-service/pkg/airtable"
 )
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
+func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("200 - OK"))
 }
 
-func webhookHandler(w http.ResponseWriter, r *http.Request) {
+func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("405 - only GET is allowed"))
