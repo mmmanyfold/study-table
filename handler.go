@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/mmmanyfold/study-table-service/pkg/airtable"
@@ -16,22 +17,15 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("405 - only GET is allowed"))
 	}
 
-	artistsRecords := airtable.GetRecords("Artists")
-	airtable.ExtractTags(artistsRecords)
+	artists := airtable.GetRecords("Artists")
+	tags := airtable.ExtractTags(artists)
 
-	// 1. down the data
-	// 2. extract tags from payload
-	// 3. format data
-	//	a. {
-	//	     tags: [{id: 1, name: "xyz"}],
-	//       artists: [{
-	//                  id: 1,
-	// 					name: 'Simone Forti',
-	// 					image: (get the first image)
-	// 					  'https://dl.airtable.com/.attachmentThumbnails/0936f073c25da2b872272632d75e696c/911b163c',
-	// 					tags: ['Performance', 'Sculpture'],
-	//                 }]
-	//     }
+	a := airtable.ArtistAndTagsPayload{
+		Tags:    tags,
+		Records: artists,
+	}
+
+	fmt.Printf("%+v", a)
 	// 4. store in S3
 
 }

@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func GetRecords(table string) ArtistRecords {
+func GetRecords(table string) []ArtistRecord {
 	baseURL := fmt.Sprintf("https://api.airtable.com/v0/appgnbNAyXRTziPYF/%s", table)
 
 	req, err := http.NewRequest("GET", baseURL, nil)
@@ -39,14 +39,14 @@ func GetRecords(table string) ArtistRecords {
 		log.Fatal(err)
 	}
 
-	return artistsJSON
+	return artistsJSON.Records
 }
 
-func ExtractTags(artists ArtistRecords) []TagRecord {
+func ExtractTags(artists []ArtistRecord) []TagRecord {
 	var tags []TagRecord
 	var tagCount = 1
 
-	for _, r := range artists.Records {
+	for _, r := range artists {
 		if len(r.Fields.Tags) > 0 {
 			for _, t := range r.Fields.Tags {
 				if !FilterTag(tags, t) {
