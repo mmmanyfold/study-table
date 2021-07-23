@@ -8,7 +8,7 @@ type TagRecord struct {
 type ArtistRecord struct {
 	CreatedTime string `json:"createdTime"`
 	Fields      struct {
-		Bio   string `json:"Bio"`
+		Info   string `json:"Info"`
 		Image []struct {
 			Filename   string `json:"filename"`
 			ID         string `json:"id"`

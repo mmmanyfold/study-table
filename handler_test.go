@@ -7,13 +7,14 @@ import (
 )
 
 func TestHealthHandler(t *testing.T) {
+	appServer := AppServer{}
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(HealthHandler)
+	handler := http.HandlerFunc(appServer.HealthHandler)
 
 	handler.ServeHTTP(rr, req)
 
@@ -29,13 +30,14 @@ func TestHealthHandler(t *testing.T) {
 }
 
 func TestWebhookHandler(t *testing.T) {
+	appServer := AppServer{}
 	req, err := http.NewRequest("POST", "/", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(WebhookHandler)
+	handler := http.HandlerFunc(appServer.WebhookHandler)
 
 	handler.ServeHTTP(rr, req)
 
