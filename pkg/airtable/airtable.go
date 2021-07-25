@@ -42,6 +42,18 @@ func GetRecords(table string) []ArtistRecord {
 	return artistsJSON.Records
 }
 
+func FilterDeletedAndPublishedArtists(records []ArtistRecord) []ArtistRecord {
+	var filtered []ArtistRecord
+
+	for _, r := range records {
+		if r.Fields.Name != "" && r.Fields.Info != "" && !r.Fields.Delete {
+			filtered = append(filtered, r)
+		}
+	}
+
+	return filtered
+}
+
 func ExtractTags(artists []ArtistRecord) []TagRecord {
 	var tags []TagRecord
 	var tagCount = 1

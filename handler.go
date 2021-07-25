@@ -32,6 +32,7 @@ func (app *AppServer) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	artists := airtable.GetRecords("Artists")
+	artists = airtable.FilterDeletedAndPublishedArtists(artists)
 	tags := airtable.ExtractTags(artists)
 	now := time.Now()
 

@@ -35,6 +35,7 @@ type ArtistRecord struct {
 		} `json:"Image"`
 		Name    string   `json:"Name"`
 		Publish bool     `json:"PUBLISH"`
+		Delete  bool     `json:"DELETE"`
 		Tags    []string `json:"Tags"`
 	} `json:"fields"`
 	ID string `json:"id"`
