@@ -7,7 +7,6 @@ IMAGE = $(CONTAINER):$(COMMIT)
 
 build:
 	@docker build \
-#	--no-cache \
 	--build-arg COMMIT=$(COMMIT) \
 	--build-arg AIRTABLE_API_KEY=$$AIRTABLE_API_KEY \
 	--build-arg AWS_ACCESS_KEY_ID=$$AWS_ACCESS_KEY_ID \
