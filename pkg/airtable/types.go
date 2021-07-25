@@ -8,7 +8,7 @@ type TagRecord struct {
 type ArtistRecord struct {
 	CreatedTime string `json:"createdTime"`
 	Fields      struct {
-		Info   string `json:"Info"`
+		Info  string `json:"Info"`
 		Image []struct {
 			Filename   string `json:"filename"`
 			ID         string `json:"id"`
@@ -40,11 +40,17 @@ type ArtistRecord struct {
 	ID string `json:"id"`
 }
 
+type Meta struct {
+	LastUpdateAt string `json:"last_updated_at"`
+	Version      string `json:"version"`
+}
+
 type ArtistRecords struct {
 	Records []ArtistRecord `json:"records"`
 }
 
 type ArtistAndTagsPayload struct {
-	Tags    []TagRecord     `json:"tags"`
+	Meta    Meta           `json:"meta"`
+	Tags    []TagRecord    `json:"tags"`
 	Records []ArtistRecord `json:"records"`
 }

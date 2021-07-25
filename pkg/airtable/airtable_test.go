@@ -51,10 +51,10 @@ func TestGetRecords(t *testing.T) {
 
 func TestFilterTag(t *testing.T) {
 	testTags := []TagRecord{{
-		Id: 1,
+		Id:   1,
 		Name: "abc",
 	}, {
-		Id: 2,
+		Id:   2,
 		Name: "1970s",
 	}}
 

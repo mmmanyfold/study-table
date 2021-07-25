@@ -9,21 +9,23 @@ import (
 	"github.com/mmmanyfold/study-table-service/pkg/airtable"
 	"log"
 	"net/http"
+	"os"
+	"time"
 )
 
 const bucket = "study-table-service-assets"
 const filename = "airtable.json"
 
 type AppServer struct {
-	awsSess *session.Session
+	awsSess  *session.Session
 	uploader *s3manager.Uploader
 }
 
-func (a *AppServer) HealthHandler(w http.ResponseWriter, r *http.Request)  {
+func (app *AppServer) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("200 - OK"))
 }
 
-func (a *AppServer) WebhookHandler(w http.ResponseWriter, r *http.Request) {
+func (app *AppServer) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("405 - only GET is allowed"))
@@ -31,8 +33,13 @@ func (a *AppServer) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 	artists := airtable.GetRecords("Artists")
 	tags := airtable.ExtractTags(artists)
+	now := time.Now()
 
 	payload := airtable.ArtistAndTagsPayload{
+		Meta: airtable.Meta{
+			LastUpdateAt: now.String(),
+			Version:      os.Getenv("COMMIT"),
+		},
 		Tags:    tags,
 		Records: artists,
 	}
@@ -46,12 +53,14 @@ func (a *AppServer) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 	body := bytes.NewReader(jsonData)
 
-	if _, err := a.uploader.Upload(&s3manager.UploadInput{
-		ACL:                       aws.String("public-read"),
-		Body:                      body,
-		Bucket:                    aws.String(bucket),
-		ContentType:               aws.String("application/json"),
-		Key:                       aws.String(filename),
+	uploader := s3manager.NewUploader(app.awsSess)
+
+	if _, err := uploader.Upload(&s3manager.UploadInput{
+		ACL:         aws.String("public-read"),
+		Body:        body,
+		Bucket:      aws.String(bucket),
+		ContentType: aws.String("application/json"),
+		Key:         aws.String(filename),
 	}); err != nil {
 		log.Printf("err: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)

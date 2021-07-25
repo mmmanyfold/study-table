@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-
-
 func main() {
 	awsSess, err := aws.InitSession()
 	if err != nil {
@@ -16,8 +14,9 @@ func main() {
 	}
 
 	uploader := s3manager.NewUploader(awsSess)
+
 	appServer := AppServer{
-		awsSess: awsSess,
+		awsSess:  awsSess,
 		uploader: uploader,
 	}
 

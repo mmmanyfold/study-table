@@ -1,29 +1,26 @@
 FROM golang:alpine as builder
-ARG COMMIT
-ARG AIRTABLE_API_KEY
 
 ENV COMMIT ${COMMIT:-undefined}
 ENV AIRTABLE_API_KEY ${AIRTABLE_API_KEY:-undefined}
+ENV AWS_ACCESS_KEY_ID ${AWS_ACCESS_KEY_ID:-undefined}
+ENV AWS_SECRET_ACCESS_KEY ${AWS_SECRET_ACCESS_KEY:-undefined}
 
-RUN echo $COMMIT
-RUN echo $AIRTABLE_API_KEY
+WORKDIR /app/study-table-service
 
-WORKDIR /app 
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
 
 COPY . .
 
-RUN ls
+RUN go build -o ./out/sts .
 
-# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" ./src
+FROM alpine:3.14
+RUN apk add ca-certificates
 
-FROM scratch
-
-WORKDIR /app
-
-# COPY --from=builder /app/ /usr/bin/
-
-# RUN ls /usr/bin
+COPY --from=builder /app/study-table-service/out/sts /app/sts
 
 EXPOSE 8080
 
-# ENTRYPOINT ["dev-to"]
+CMD ["/app/sts"]
