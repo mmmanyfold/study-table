@@ -8,7 +8,8 @@ import (
 
 func InitSession() (*session.Session, error) {
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String(endpoints.UsEast1RegionID)},
+		CredentialsChainVerboseErrors: aws.Bool(true),
+		Region:                        aws.String(endpoints.UsEast1RegionID)},
 	)
 	if err != nil {
 		return nil, err

@@ -7,6 +7,7 @@ IMAGE = $(CONTAINER):$(COMMIT)
 
 build:
 	@docker build \
+	--no-cache \
 	--build-arg COMMIT=$(COMMIT) \
 	--build-arg AIRTABLE_API_KEY=$$AIRTABLE_API_KEY \
 	--build-arg AWS_ACCESS_KEY_ID=$$AWS_ACCESS_KEY_ID \
@@ -33,5 +34,5 @@ push:
 	@docker push $(ECR_REPO_URI)/study-table-service:latest
 
 server:
-	@docker run -it -p 8080:8080 study-table-service:dev
+	@docker run -it -p 8080:8080 study-table-service:$(COMMIT)
 
