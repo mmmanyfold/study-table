@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/mmmanyfold/study-table-service/cmd/server"
 	"github.com/mmmanyfold/study-table-service/pkg/aws"
 	"log"
 	"net/http"
@@ -15,9 +16,9 @@ func main() {
 
 	uploader := s3manager.NewUploader(awsSess)
 
-	appServer := AppServer{
-		awsSess:  awsSess,
-		uploader: uploader,
+	appServer := server.AppServer{
+		Sess:     awsSess,
+		Uploader: uploader,
 	}
 
 	http.HandleFunc("/", appServer.HealthHandler)
