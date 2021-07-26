@@ -50,7 +50,7 @@ func FilterDeletedAndPublishedArtists(records []ArtistRecord) []ArtistRecord {
 	var filtered []ArtistRecord
 
 	for _, r := range records {
-		if r.Fields.Name != "" && r.Fields.Info != "" && !r.Fields.Delete {
+		if r.Fields.Name != "" && !r.Fields.Delete && r.Fields.Publish == true {
 			filtered = append(filtered, r)
 		}
 	}
