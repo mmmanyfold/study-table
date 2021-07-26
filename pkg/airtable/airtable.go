@@ -1,12 +1,16 @@
 package airtable
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/mmmanyfold/study-table-service/pkg/aws"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func GetRecords(table string) []ArtistRecord {
@@ -46,7 +50,7 @@ func FilterDeletedAndPublishedArtists(records []ArtistRecord) []ArtistRecord {
 	var filtered []ArtistRecord
 
 	for _, r := range records {
-		if r.Fields.Name != "" && r.Fields.Info != "" && !r.Fields.Delete {
+		if r.Fields.Name != "" && !r.Fields.Delete && r.Fields.Publish == true {
 			filtered = append(filtered, r)
 		}
 	}
@@ -83,4 +87,44 @@ func FilterTag(tags []TagRecord, tag string) bool {
 	}
 
 	return false
+}
+
+func ScheduleAirtableSync(sess *session.Session) {
+	everyHour := time.NewTicker(1 * time.Hour)
+
+	for {
+		select {
+		case <-everyHour.C:
+			log.Println("syncing airtable records")
+
+			artists := GetRecords("Artists")
+			artists = FilterDeletedAndPublishedArtists(artists)
+			tags := ExtractTags(artists)
+			now := time.Now()
+
+			payload := ArtistAndTagsPayload{
+				Meta: Meta{
+					LastUpdateAt: now.String(),
+					Version:      os.Getenv("COMMIT"),
+				},
+				Tags:    tags,
+				Records: artists,
+			}
+
+			jsonData, err := json.Marshal(payload)
+			if err != nil {
+				log.Printf("err: %v", err)
+				return
+			}
+
+			body := bytes.NewReader(jsonData)
+
+			if err := aws.UploadFile(sess, body); err != nil {
+				log.Printf("err: %v", err)
+				return
+			}
+
+			log.Println("file successfully uploaded to S3")
+		}
+	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func TestHealthHandler(t *testing.T) {
-	appServer := AppServer{}
+	appServer := AppConfig{}
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -30,7 +30,7 @@ func TestHealthHandler(t *testing.T) {
 }
 
 func TestWebhookHandler(t *testing.T) {
-	appServer := AppServer{}
+	appServer := AppConfig{}
 	req, err := http.NewRequest("POST", "/", nil)
 	if err != nil {
 		t.Fatal(err)

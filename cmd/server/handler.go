@@ -3,23 +3,19 @@ package server
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/mmmanyfold/study-table-service/pkg/airtable"
+	"github.com/mmmanyfold/study-table-service/pkg/aws"
 	"log"
 	"net/http"
 	"os"
 	"time"
 )
 
-const bucket = "study-table-service-assets"
-const filename = "airtable.json"
-
-func (app *AppServer) HealthHandler(w http.ResponseWriter, r *http.Request) {
+func (app *AppConfig) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("200 - OK"))
 }
 
-func (app *AppServer) WebhookHandler(w http.ResponseWriter, r *http.Request) {
+func (app *AppConfig) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("405 - only GET is allowed"))
@@ -48,15 +44,7 @@ func (app *AppServer) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 	body := bytes.NewReader(jsonData)
 
-	uploader := s3manager.NewUploader(app.Sess)
-
-	if _, err := uploader.Upload(&s3manager.UploadInput{
-		ACL:         aws.String("public-read"),
-		Body:        body,
-		Bucket:      aws.String(bucket),
-		ContentType: aws.String("application/json"),
-		Key:         aws.String(filename),
-	}); err != nil {
+	if err := aws.UploadFile(app.Sess, body); err != nil {
 		log.Printf("err: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("500 - failed to upload JSON to AWS S3"))
