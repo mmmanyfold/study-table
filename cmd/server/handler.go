@@ -23,7 +23,7 @@ func (app *AppConfig) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		log.Printf("err 1: %v", err)
+		log.Printf("err: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("500 - failed to encode JSON payload"))
 	}
@@ -31,7 +31,7 @@ func (app *AppConfig) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	body := bytes.NewReader(jsonData)
 
 	if err := aws.UploadFile(app.Sess, body); err != nil {
-		log.Printf("err 2: %v", err)
+		log.Printf("err: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("500 - failed to upload JSON to AWS S3"))
 	}
