@@ -46,8 +46,9 @@ type Meta struct {
 	Version      string `json:"version"`
 }
 
-type ArtistRecords struct {
+type Response struct {
 	Records []ArtistRecord `json:"records"`
+	Offset  string         `json:"offset"`
 }
 
 type ArtistAndTagsPayload struct {
