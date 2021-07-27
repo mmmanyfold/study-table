@@ -71,8 +71,7 @@ func filterDeletedAndPublishedArtists(records []ArtistRecord) []ArtistRecord {
 
 func GetAirtable() ArtistAndTagsPayload {
 	var response Response
-	
-	response.Offset = ""
+
 	airtable := GetRecords(response)
 	filtered := filterDeletedAndPublishedArtists(airtable.Records)
 	tags := extractTags(filtered)
