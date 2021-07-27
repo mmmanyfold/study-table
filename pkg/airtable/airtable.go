@@ -88,11 +88,11 @@ func GetAirtable() ArtistAndTagsPayload {
 }
 
 func ScheduleAirtableSync(sess *session.Session) {
-	everyHour := time.NewTicker(1 * time.Hour)
+	every30Minutes := time.NewTicker(30 * time.Minute)
 
 	for {
 		select {
-		case <-everyHour.C:
+		case <-every30Minutes.C:
 			log.Println("syncing airtable records")
 
 			payload := GetAirtable()
