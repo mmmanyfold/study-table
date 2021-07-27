@@ -60,7 +60,7 @@ func TestFilterTag(t *testing.T) {
 
 	validTags := []string{"abc", "1970s"}
 	for _, tagName := range validTags {
-		if !FilterTag(testTags, tagName) {
+		if !filterTag(testTags, tagName) {
 			t.Errorf("tag: %s, should be included", tagName)
 		}
 

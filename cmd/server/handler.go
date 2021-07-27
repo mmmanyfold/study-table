@@ -7,8 +7,6 @@ import (
 	"github.com/mmmanyfold/study-table-service/pkg/aws"
 	"log"
 	"net/http"
-	"os"
-	"time"
 )
 
 func (app *AppConfig) HealthHandler(w http.ResponseWriter, r *http.Request) {
@@ -21,19 +19,7 @@ func (app *AppConfig) WebhookHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("405 - only GET is allowed"))
 	}
 
-	artists := airtable.GetRecords("Artists")
-	artists = airtable.FilterDeletedAndPublishedArtists(artists)
-	tags := airtable.ExtractTags(artists)
-	now := time.Now()
-
-	payload := airtable.ArtistAndTagsPayload{
-		Meta: airtable.Meta{
-			LastUpdateAt: now.String(),
-			Version:      os.Getenv("COMMIT"),
-		},
-		Tags:    tags,
-		Records: artists,
-	}
+	payload := airtable.GetAirtable()
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {

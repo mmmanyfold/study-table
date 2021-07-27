@@ -13,8 +13,12 @@ import (
 	"time"
 )
 
-func GetRecords(table string) []ArtistRecord {
-	baseURL := fmt.Sprintf("https://api.airtable.com/v0/appgnbNAyXRTziPYF/%s", table)
+func GetRecords(airtable Response) Response {
+	baseURL := "https://api.airtable.com/v0/appgnbNAyXRTziPYF/Artists"
+
+	if airtable.Offset != "" {
+		baseURL = fmt.Sprintf("%s?offset=%s", baseURL, airtable.Offset)
+	}
 
 	req, err := http.NewRequest("GET", baseURL, nil)
 	if err != nil {
@@ -36,17 +40,24 @@ func GetRecords(table string) []ArtistRecord {
 		log.Fatal(err)
 	}
 
-	var artistsJSON ArtistRecords
+	var airtableJSON Response
 
-	err = json.Unmarshal([]byte(body), &artistsJSON)
-	if err != nil {
+	if err = json.Unmarshal([]byte(body), &airtableJSON); err != nil {
 		log.Fatal(err)
 	}
 
-	return artistsJSON.Records
+	if airtableJSON.Offset != "" {
+		airtable.Offset = airtableJSON.Offset
+		airtable.Records = append(airtable.Records, airtableJSON.Records...)
+		return GetRecords(airtable)
+	}
+
+	airtable.Records = append(airtable.Records, airtableJSON.Records...)
+
+	return airtable
 }
 
-func FilterDeletedAndPublishedArtists(records []ArtistRecord) []ArtistRecord {
+func filterDeletedAndPublishedArtists(records []ArtistRecord) []ArtistRecord {
 	var filtered []ArtistRecord
 
 	for _, r := range records {
@@ -58,35 +69,23 @@ func FilterDeletedAndPublishedArtists(records []ArtistRecord) []ArtistRecord {
 	return filtered
 }
 
-func ExtractTags(artists []ArtistRecord) []TagRecord {
-	var tags []TagRecord
-	var tagCount = 1
+func GetAirtable() ArtistAndTagsPayload {
+	var response Response
+	
+	response.Offset = ""
+	airtable := GetRecords(response)
+	filtered := filterDeletedAndPublishedArtists(airtable.Records)
+	tags := extractTags(filtered)
+	now := time.Now()
 
-	for _, r := range artists {
-		if len(r.Fields.Tags) > 0 {
-			for _, t := range r.Fields.Tags {
-				if !FilterTag(tags, t) {
-					tags = append(tags, TagRecord{
-						Id:   tagCount,
-						Name: t,
-					})
-					tagCount += 1
-				}
-			}
-		}
+	return ArtistAndTagsPayload{
+		Meta: Meta{
+			LastUpdateAt: now.String(),
+			Version:      os.Getenv("COMMIT"),
+		},
+		Tags:    tags,
+		Records: filtered,
 	}
-
-	return tags
-}
-
-func FilterTag(tags []TagRecord, tag string) bool {
-	for _, t := range tags {
-		if t.Name == tag {
-			return true
-		}
-	}
-
-	return false
 }
 
 func ScheduleAirtableSync(sess *session.Session) {
@@ -97,19 +96,7 @@ func ScheduleAirtableSync(sess *session.Session) {
 		case <-everyHour.C:
 			log.Println("syncing airtable records")
 
-			artists := GetRecords("Artists")
-			artists = FilterDeletedAndPublishedArtists(artists)
-			tags := ExtractTags(artists)
-			now := time.Now()
-
-			payload := ArtistAndTagsPayload{
-				Meta: Meta{
-					LastUpdateAt: now.String(),
-					Version:      os.Getenv("COMMIT"),
-				},
-				Tags:    tags,
-				Records: artists,
-			}
+			payload := GetAirtable()
 
 			jsonData, err := json.Marshal(payload)
 			if err != nil {
@@ -127,4 +114,35 @@ func ScheduleAirtableSync(sess *session.Session) {
 			log.Println("file successfully uploaded to S3")
 		}
 	}
+}
+
+func filterTag(tags []TagRecord, tag string) bool {
+	for _, t := range tags {
+		if t.Name == tag {
+			return true
+		}
+	}
+
+	return false
+}
+
+func extractTags(artists []ArtistRecord) []TagRecord {
+	var tags []TagRecord
+	var tagCount = 1
+
+	for _, r := range artists {
+		if len(r.Fields.Tags) > 0 {
+			for _, t := range r.Fields.Tags {
+				if !filterTag(tags, t) {
+					tags = append(tags, TagRecord{
+						Id:   tagCount,
+						Name: t,
+					})
+					tagCount += 1
+				}
+			}
+		}
+	}
+
+	return tags
 }
