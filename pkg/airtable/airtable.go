@@ -25,7 +25,9 @@ func GetRecords(airtable Response) Response {
 		log.Fatal(err)
 	}
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 20,
+	}
 
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("AIRTABLE_API_KEY")))
 	resp, err := client.Do(req)
