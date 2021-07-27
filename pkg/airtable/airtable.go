@@ -8,6 +8,7 @@ import (
 	"github.com/mmmanyfold/study-table-service/pkg/aws"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -25,8 +26,16 @@ func GetRecords(airtable Response) Response {
 		log.Fatal(err)
 	}
 
+	t := &http.Transport{
+		Dial: (&net.Dialer{
+			Timeout:   60 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 60 * time.Second,
+	}
+
 	client := &http.Client{
-		Timeout: time.Second * 20,
+		Transport: t,
 	}
 
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("AIRTABLE_API_KEY")))
