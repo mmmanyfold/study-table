@@ -110,14 +110,14 @@ func ScheduleAirtableSync(sess *session.Session) {
 
 			jsonData, err := json.Marshal(payload)
 			if err != nil {
-				log.Printf("err: %v", err)
+				log.Printf("err 3: %v", err)
 				return
 			}
 
 			body := bytes.NewReader(jsonData)
 
 			if err := aws.UploadFile(sess, body); err != nil {
-				log.Printf("err: %v", err)
+				log.Printf("err 4: %v", err)
 				return
 			}
 

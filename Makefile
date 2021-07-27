@@ -1,4 +1,4 @@
-.PHONY: build clean deploy run push tag push format server
+.PHONY: build clean deploy run tag push format server
 
 CONTAINER = study-table-service
 COMMIT = $$(git rev-parse --short HEAD)
@@ -17,8 +17,7 @@ build:
 clean:
 	echo "fix me"
 
-deploy: clean build
-	echo "fix me"
+deploy: build tag push
 
 format:
 	gofmt -w .
