@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/mmmanyfold/study-table-service/cmd/server"
-	"github.com/mmmanyfold/study-table-service/pkg/airtable"
 	"github.com/mmmanyfold/study-table-service/pkg/aws"
 	"log"
 	"net/http"
@@ -22,7 +21,7 @@ func main() {
 		Uploader: uploader,
 	}
 
-	go airtable.ScheduleAirtableSync(appConfig.Sess)
+	//go airtable.ScheduleAirtableSync(appConfig.Sess)
 
 	http.HandleFunc("/", appConfig.HealthHandler)
 	http.HandleFunc("/webhook", appConfig.WebhookHandler)
