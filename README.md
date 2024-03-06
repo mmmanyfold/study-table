@@ -1,6 +1,5 @@
 # `mmmanyfold/study-table-service`
 
-TODO: add project description
 
 ### DEPENDENCIES
 
@@ -10,4 +9,10 @@ TODO: add project description
 
 ```sh
 export AIRTABLE_API_KEY=xyz
+```
+
+### DEPLOY
+
+```sh
+make deploy
 ```

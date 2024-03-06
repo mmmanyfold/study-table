@@ -14,9 +14,6 @@ build:
 	--build-arg AWS_SECRET_ACCESS_KEY=$$AWS_SECRET_ACCESS_KEY \
 	-t $(IMAGE) .
 
-clean:
-	echo "fix me"
-
 deploy: build tag push
 
 format:
