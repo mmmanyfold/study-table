@@ -7,6 +7,7 @@ IMAGE = $(CONTAINER):$(COMMIT)
 
 build:
 	@docker build \
+	--platform linux/amd64 \
 	--no-cache \
 	--build-arg COMMIT=$(COMMIT) \
 	--build-arg AIRTABLE_API_KEY=$$AIRTABLE_API_KEY \
